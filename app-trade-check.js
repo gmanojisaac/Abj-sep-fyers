@@ -14,8 +14,8 @@ var CEOption = 'NSE:BANKNIFTY2490451600CE';
 var PEOption = 'NSE:BANKNIFTY2490451300PE';
 
 OptionArr= [CEOption,  PEOption];
-singleTradeCE= true;
-singleTradePE= false;
+singleTradeCE= false;
+singleTradePE= true;
 
 Dataskt.on("connect",function(){
     Dataskt.subscribe(OptionArr) 
@@ -77,12 +77,12 @@ Dataskt.on("message",function(message){
                          "type": 1,  //limit -1
                          "side": 1, //buy -1 sell - -1
                          "productType": "BO", //BO
-                         "limitPrice": (message.ltp + 0.5), 
+                         "limitPrice": Math.round(message.ltp + 0.5), 
                          "stopPrice": 0, 
                          "validity": "DAY", //BO-Day
 
-                         "stopLoss": (message.ltp * 0.9), //M-BO 800
-                         "takeProfit": (message.ltp * 1.1), //M-BO 830
+                         "stopLoss": Math.round(message.ltp * 0.9), //M-BO 800
+                         "takeProfit": Math.round(message.ltp * 1.1), //M-BO 830
                          "offlineOrder": false, 
                          "disclosedQty": 0  //BO-0
 
@@ -101,7 +101,7 @@ Dataskt.on("message",function(message){
                fyers.place_order(reqBody).then((response) => {
                  console.log(response, message.ltp)
                }).catch((error) => {
-                   console.log(error, message.ltp)
+                   console.log(error, message.ltp, (Math.round(message.ltp + 0.5) - Math.round(message.ltp * 0.9) ))
                })
                singleTradeCE = false;
                 }
@@ -113,19 +113,20 @@ Dataskt.on("message",function(message){
                 if(singleTradePE == true){
                     console.log("PEOption" , '/', message.ltp);
                     const reqBody={
-                        symbol: PEOption, // Replace with your desired symbol
-                        qty: 15,                     // Quantity
-                        type: 1,                    // Order type (1 for limit)
-                        side: 1,                    // 1 for Buy, -1 for Sell
-                        productType: "INTRADAY",    // Product type
-                        limitPrice: message.ltp + 0.5,       // Limit price
-                        stopLoss:  message.ltp * 0.9,           // Stop-loss price
-                        takeProfit: message.ltp * 1.04,         // Take-profit price
-                        disclosedQty: 0,            // Disclosed quantity
-                        validity: "DAY",            // Validity
-                        offlineOrder: "False",      // Online order
-                        stopLossTrigger: message.ltp * 0.91,    // Stop-loss trigger price
-                        orderType: "BO"             // Order type as Bracket Order (BO)
+
+                        "symbol": PEOption, 
+                        "qty": 15, 
+                        "type": 1,  //limit -1
+                        "side": -1, //buy -1 sell - -1
+                        "productType": "BO", //BO
+                        "limitPrice": Math.round(message.ltp + 0.5), 
+                        "stopPrice": 0, 
+                        "validity": "DAY", //BO-Day
+
+                        "stopLoss": Math.round(message.ltp * 0.9), //M-BO 800
+                        "takeProfit": Math.round(message.ltp * 1.1), //M-BO 830
+                        "offlineOrder": false, 
+                        "disclosedQty": 0  //BO-0
                   }
 
 
